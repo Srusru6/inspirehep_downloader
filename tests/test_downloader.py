@@ -1,5 +1,5 @@
 """
-Unit tests for INSPIRE-HEP downloader.
+INSPIRE-HEP 下载器的单元测试。
 """
 
 import unittest
@@ -14,26 +14,26 @@ from inspirehep_downloader.downloader import download_pdf, download_metadata, do
 
 
 class TestInspireHEPClient(unittest.TestCase):
-    """Tests for InspireHEPClient class."""
+    """InspireHEPClient 类的测试。"""
     
     def setUp(self):
-        """Set up test fixtures."""
+        """设置测试装置。"""
         self.client = InspireHEPClient()
     
     def test_client_initialization(self):
-        """Test that client initializes correctly."""
+        """测试客户端是否正确初始化。"""
         self.assertEqual(self.client.BASE_URL, "https://inspirehep.net/api")
         self.assertEqual(self.client.timeout, 30)
         self.assertIsNotNone(self.client.session)
     
     def test_client_custom_timeout(self):
-        """Test client with custom timeout."""
+        """测试带有自定义超时的客户端。"""
         client = InspireHEPClient(timeout=60)
         self.assertEqual(client.timeout, 60)
     
     @patch('inspirehep_downloader.client.requests.Session.get')
     def test_search_literature(self, mock_get):
-        """Test literature search."""
+        """测试文献搜索。"""
         mock_response = Mock()
         mock_response.json.return_value = {
             "hits": {
@@ -50,7 +50,7 @@ class TestInspireHEPClient(unittest.TestCase):
     
     @patch('inspirehep_downloader.client.requests.Session.get')
     def test_get_record(self, mock_get):
-        """Test getting a specific record."""
+        """测试获取特定记录。"""
         mock_response = Mock()
         mock_response.json.return_value = {
             "id": "12345",
@@ -65,7 +65,7 @@ class TestInspireHEPClient(unittest.TestCase):
     
     @patch('inspirehep_downloader.client.requests.Session.get')
     def test_get_pdf_url_from_documents(self, mock_get):
-        """Test getting PDF URL from documents."""
+        """测试从文档中获取 PDF URL。"""
         mock_response = Mock()
         mock_response.json.return_value = {
             "metadata": {
@@ -82,7 +82,7 @@ class TestInspireHEPClient(unittest.TestCase):
     
     @patch('inspirehep_downloader.client.requests.Session.get')
     def test_get_pdf_url_from_arxiv(self, mock_get):
-        """Test getting PDF URL from arXiv."""
+        """测试从 arXiv 获取 PDF URL。"""
         mock_response = Mock()
         mock_response.json.return_value = {
             "metadata": {
@@ -98,7 +98,7 @@ class TestInspireHEPClient(unittest.TestCase):
     
     @patch('inspirehep_downloader.client.requests.Session.get')
     def test_get_pdf_url_not_available(self, mock_get):
-        """Test getting PDF URL when not available."""
+        """测试在 PDF URL 不可用时获取它。"""
         mock_response = Mock()
         mock_response.json.return_value = {
             "metadata": {
@@ -114,7 +114,7 @@ class TestInspireHEPClient(unittest.TestCase):
     
     @patch('inspirehep_downloader.client.requests.Session.get')
     def test_get_metadata(self, mock_get):
-        """Test getting formatted metadata."""
+        """测试获取格式化的元数据。"""
         mock_response = Mock()
         mock_response.json.return_value = {
             "metadata": {
@@ -138,20 +138,20 @@ class TestInspireHEPClient(unittest.TestCase):
 
 
 class TestDownloaderFunctions(unittest.TestCase):
-    """Tests for downloader functions."""
+    """下载器功能的测试。"""
     
     def setUp(self):
-        """Set up test fixtures."""
+        """设置测试装置。"""
         self.temp_dir = tempfile.mkdtemp()
     
     def tearDown(self):
-        """Clean up test fixtures."""
+        """清理测试装置。"""
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
     
     @patch('inspirehep_downloader.downloader.InspireHEPClient')
     def test_download_pdf(self, mock_client_class):
-        """Test downloading PDF."""
+        """测试下载 PDF。"""
         mock_client = Mock()
         mock_client.get_pdf_url.return_value = "https://example.com/paper.pdf"
         mock_client.download_file = Mock()
@@ -165,7 +165,7 @@ class TestDownloaderFunctions(unittest.TestCase):
     
     @patch('inspirehep_downloader.downloader.InspireHEPClient')
     def test_download_pdf_not_available(self, mock_client_class):
-        """Test downloading PDF when not available."""
+        """测试在 PDF 不可用时下载它。"""
         mock_client = Mock()
         mock_client.get_pdf_url.return_value = None
         mock_client_class.return_value = mock_client
@@ -175,7 +175,7 @@ class TestDownloaderFunctions(unittest.TestCase):
     
     @patch('inspirehep_downloader.downloader.InspireHEPClient')
     def test_download_metadata_json(self, mock_client_class):
-        """Test downloading metadata as JSON."""
+        """测试下载 JSON 格式的元数据。"""
         mock_client = Mock()
         mock_client.get_metadata.return_value = {
             "record_id": "12345",
@@ -195,7 +195,7 @@ class TestDownloaderFunctions(unittest.TestCase):
     
     @patch('inspirehep_downloader.downloader.InspireHEPClient')
     def test_download_metadata_txt(self, mock_client_class):
-        """Test downloading metadata as text."""
+        """测试下载文本格式的元数据。"""
         mock_client = Mock()
         mock_client.get_metadata.return_value = {
             "record_id": "12345",
@@ -223,14 +223,14 @@ class TestDownloaderFunctions(unittest.TestCase):
     
     @patch('inspirehep_downloader.downloader.InspireHEPClient')
     def test_download_metadata_invalid_format(self, mock_client_class):
-        """Test downloading metadata with invalid format."""
+        """测试使用无效格式下载元数据。"""
         with self.assertRaises(ValueError):
             download_metadata("12345", output_dir=self.temp_dir, format="xml")
     
     @patch('inspirehep_downloader.downloader.download_pdf')
     @patch('inspirehep_downloader.downloader.download_metadata')
     def test_download_record(self, mock_download_metadata, mock_download_pdf):
-        """Test downloading both PDF and metadata."""
+        """测试下载 PDF 和元数据。"""
         mock_download_pdf.return_value = os.path.join(self.temp_dir, "12345.pdf")
         mock_download_metadata.return_value = os.path.join(self.temp_dir, "12345_metadata.json")
         

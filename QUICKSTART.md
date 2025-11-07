@@ -1,165 +1,165 @@
-# Quick Start Guide
+# 快速入门指南
 
-This guide will help you get started with the INSPIRE-HEP Downloader.
+本指南将帮助您开始使用 INSPIRE-HEP 下载器。
 
-## Installation
+## 安装
 
-1. Clone the repository:
+1. 克隆存储库:
 ```bash
 git clone https://github.com/Srusru6/inspirehep_downloader.git
 cd inspirehep_downloader
 ```
 
-2. Install dependencies:
+2. 安装依赖项:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Install the package:
+3. 安装软件包:
 ```bash
 pip install -e .
 ```
 
-## Your First Download
+## 您的首次下载
 
-### Using the Command Line
+### 使用命令行
 
-The easiest way to download papers is using the command line interface:
+下载论文最简单的方法是使用命令行界面：
 
 ```bash
-# Search for papers by an author
+# 按作者搜索论文
 inspirehep-download --search "author:witten" --size 5
 
-# Download a specific paper by its INSPIRE-HEP record ID
+# 通过其 INSPIRE-HEP 记录 ID 下载特定论文
 inspirehep-download 12345
 
-# Download to a specific directory
+# 下载到特定目录
 inspirehep-download 12345 --output-dir ~/Downloads/papers
 ```
 
-### Using Python
+### 使用 Python
 
-You can also use the Python API directly:
+您也可以直接使用 Python API：
 
 ```python
 from inspirehep_downloader import InspireHEPClient, download_pdf, download_metadata
 
-# Initialize the client
+# 初始化客户端
 client = InspireHEPClient()
 
-# Search for papers
+# 搜索论文
 results = client.search_literature("author:witten", size=5)
-print(f"Found {results['hits']['total']} papers")
+print(f"找到 {results['hits']['total']} 篇论文")
 
-# Download a paper
+# 下载论文
 download_pdf("12345", output_dir="./papers")
 download_metadata("12345", output_dir="./papers", format="json")
 ```
 
-## Common Use Cases
+## 常见用例
 
-### 1. Search for Papers
+### 1. 搜索论文
 
 ```bash
-# By author
+# 按作者
 inspirehep-download --search "author:maldacena" --size 10
 
-# By title
+# 按标题
 inspirehep-download --search "title:ads/cft" --size 5
 
-# By keyword
+# 按关键字
 inspirehep-download --search "black holes" --size 20
 ```
 
-### 2. Download PDFs
+### 2. 下载 PDF
 
 ```bash
-# Download just the PDF
+# 仅下载 PDF
 inspirehep-download 12345 --pdf-only
 
-# Download with custom filename
+# 使用自定义文件名下载
 inspirehep-download 12345 --output-dir ./papers
 ```
 
-### 3. Download Metadata
+### 3. 下载元数据
 
 ```bash
-# Download as JSON
+# 下载为 JSON
 inspirehep-download 12345 --metadata-only --format json
 
-# Download as text file
+# 下载为文本文件
 inspirehep-download 12345 --metadata-only --format txt
 ```
 
-### 4. Batch Downloads
+### 4. 批量下载
 
-Use Python for batch downloads:
+使用 Python 进行批量下载：
 
 ```python
 from inspirehep_downloader import InspireHEPClient, download_record
 
 client = InspireHEPClient()
 
-# Search for multiple papers
+# 搜索多篇论文
 results = client.search_literature("author:witten", size=10)
 
-# Download each paper
+# 下载每篇论文
 for hit in results["hits"]["hits"]:
     record_id = hit["id"]
     try:
         download_record(record_id, output_dir="./witten_papers")
-        print(f"✓ Downloaded {record_id}")
+        print(f"✓ 已下载 {record_id}")
     except Exception as e:
-        print(f"✗ Failed to download {record_id}: {e}")
+        print(f"✗ 下载失败 {record_id}: {e}")
 ```
 
-## Tips
+## 提示
 
-1. **Finding Record IDs**: Use the search function first to find papers, then note their record IDs for downloading.
+1. **查找记录 ID**: 首先使用搜索功能查找论文，然后记下其记录 ID 以供下载。
 
-2. **Network Issues**: If downloads fail, check your internet connection and try again.
+2. **网络问题**: 如果下载失败，请检查您的互联网连接并重试。
 
-3. **PDF Availability**: Not all papers have PDFs available. The tool will try to find PDFs from INSPIRE-HEP documents or arXiv.
+3. **PDF 可用性**: 并非所有论文都有可用的 PDF。该工具将尝试从 INSPIRE-HEP 文档或 arXiv 中查找 PDF。
 
-4. **Metadata Formats**: 
-   - Use `json` format for programmatic processing
-   - Use `txt` format for human-readable output
+4. **元数据格式**: 
+   - 使用 `json` 格式进行编程处理
+   - 使用 `txt` 格式进行人类可读的输出
 
-## Getting Help
+## 获取帮助
 
-For more information:
+有关更多信息：
 
 ```bash
 inspirehep-download --help
 ```
 
-Or check the [full documentation](README.md).
+或查看[完整文档](README.md)。
 
-## Examples
+## 示例
 
-See `examples.py` for more detailed usage examples.
+有关更详细的用法示例，请参见 `examples.py`。
 
-## Troubleshooting
+## 疑难解答
 
-**Problem**: `inspirehep-download: command not found`
+**问题**: `inspirehep-download: command not found`
 
-**Solution**: Make sure you installed the package with `pip install -e .`
+**解决方案**: 确保您已使用 `pip install -e .` 安装了软件包
 
 ---
 
-**Problem**: Download fails with "No PDF available"
+**问题**: 下载失败，显示“无可用 PDF”
 
-**Solution**: Not all papers have PDFs. Try downloading just the metadata instead:
+**解决方案**: 并非所有论文都有 PDF。请尝试仅下载元数据：
 ```bash
 inspirehep-download 12345 --metadata-only
 ```
 
 ---
 
-**Problem**: Connection timeout
+**问题**: 连接超时
 
-**Solution**: Increase the timeout by using the Python API:
+**解决方案**: 通过使用 Python API 增加超时时间：
 ```python
 from inspirehep_downloader import InspireHEPClient
-client = InspireHEPClient(timeout=120)  # 2 minutes
+client = InspireHEPClient(timeout=120)  # 2 分钟
 ```

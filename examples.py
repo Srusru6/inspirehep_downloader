@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 """
-Example script demonstrating the usage of inspirehep_downloader.
+演示 inspirehep_downloader 用法的示例脚本。
 """
 
 from inspirehep_downloader import InspireHEPClient, download_pdf, download_metadata, download_record
 
 
 def example_search():
-    """Example: Search for literature."""
+    """示例：搜索文献。"""
     print("=" * 80)
-    print("Example 1: Searching for literature")
+    print("示例 1：搜索文献")
     print("=" * 80)
     
     client = InspireHEPClient()
     
-    # Search by author
+    # 按作者搜索
     results = client.search_literature("author:witten", size=3)
     hits = results.get("hits", {}).get("hits", [])
     
-    print(f"Found {results.get('hits', {}).get('total', 0)} papers by Witten")
-    print(f"Showing first {len(hits)} results:\n")
+    print(f"找到 {results.get('hits', {}).get('total', 0)} 篇 Witten 的论文")
+    print(f"显示前 {len(hits)} 个结果：\n")
     
     for i, hit in enumerate(hits, 1):
         metadata = hit.get("metadata", {})
@@ -31,86 +31,85 @@ def example_search():
 
 
 def example_get_metadata():
-    """Example: Get metadata for a specific record."""
+    """示例：获取特定记录的元数据。"""
     print("=" * 80)
-    print("Example 2: Getting metadata")
+    print("示例 2：获取元数据")
     print("=" * 80)
     
     client = InspireHEPClient()
     
-    # Use a well-known paper (you may need to replace with a valid record ID)
+    # 使用一篇著名的论文（您可能需要替换为有效的记录 ID）
     record_id = "1"
     
     try:
         metadata = client.get_metadata(record_id)
         
-        print(f"Record ID: {metadata['record_id']}")
-        print(f"Title: {metadata['title']}")
-        print(f"Authors: {', '.join(metadata['authors'][:3])}")
+        print(f"记录 ID: {metadata['record_id']}")
+        print(f"标题: {metadata['title']}")
+        print(f"作者: {', '.join(metadata['authors'][:3])}")
         if len(metadata['authors']) > 3:
-            print(f"  (and {len(metadata['authors']) - 3} more authors)")
-        print(f"Publication Date: {metadata['publication_date']}")
+            print(f"  (以及另外 {len(metadata['authors']) - 3} 位作者)")
+        print(f"出版日期: {metadata['publication_date']}")
         print(f"arXiv ID: {metadata['arxiv_id']}")
-        print(f"Citations: {metadata['citations']}")
+        print(f"引文: {metadata['citations']}")
         print()
     except Exception as e:
-        print(f"Error getting metadata: {e}")
+        print(f"获取元数据时出错: {e}")
         print()
 
 
 def example_download():
-    """Example: Download PDF and metadata."""
+    """示例：下载 PDF 和元数据。"""
     print("=" * 80)
-    print("Example 3: Downloading PDF and metadata")
+    print("示例 3：下载 PDF 和元数据")
     print("=" * 80)
     
-    # Use a valid record ID
+    # 使用有效的记录 ID
     record_id = "1"
     
-    print(f"Attempting to download record {record_id}...")
-    print("Note: This will only work if the record has an available PDF")
+    print(f"正在尝试下载记录 {record_id}...")
+    print("注意：这仅在记录具有可用的 PDF 时才有效")
     print()
     
     try:
         results = download_record(record_id, output_dir="./examples_output")
         
         if results.get("pdf"):
-            print(f"✓ PDF downloaded: {results['pdf']}")
+            print(f"✓ PDF 已下载: {results['pdf']}")
         else:
-            print("✗ PDF not available")
+            print("✗ PDF 不可用")
         
         if results.get("metadata"):
-            print(f"✓ Metadata downloaded: {results['metadata']}")
+            print(f"✓ 元数据已下载: {results['metadata']}")
         else:
-            print("✗ Metadata not available")
+            print("✗ 元数据不可用")
         
         print()
     except Exception as e:
-        print(f"Error during download: {e}")
+        print(f"下载期间出错: {e}")
         print()
 
 
 if __name__ == "__main__":
-    print("\nINSPIRE-HEP Downloader Examples\n")
+    print("\nINSPIRE-HEP 下载器示例\n")
     
-    # Note: These examples may fail if the INSPIRE-HEP API is not accessible
-    # or if the record IDs are invalid
+    # 注意：如果无法访问 INSPIRE-HEP API 或记录 ID 无效，这些示例可能会失败
     
-    print("Note: Examples may require internet access to inspirehep.net\n")
+    print("注意：示例可能需要互联网访问 inspirehep.net\n")
     
     try:
         example_search()
     except Exception as e:
-        print(f"Search example failed: {e}\n")
+        print(f"搜索示例失败: {e}\n")
     
     try:
         example_get_metadata()
     except Exception as e:
-        print(f"Metadata example failed: {e}\n")
+        print(f"元数据示例失败: {e}\n")
     
     try:
         example_download()
     except Exception as e:
-        print(f"Download example failed: {e}\n")
+        print(f"下载示例失败: {e}\n")
     
-    print("Examples completed!")
+    print("示例完成！")

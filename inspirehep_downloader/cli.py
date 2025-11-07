@@ -1,5 +1,5 @@
 """
-Command-line interface for INSPIRE-HEP downloader.
+INSPIRE-HEP 下载器的命令行界面。
 """
 
 import argparse
@@ -9,28 +9,28 @@ from .client import InspireHEPClient
 
 
 def main():
-    """Main entry point for the CLI."""
+    """CLI 的主入口点。"""
     parser = argparse.ArgumentParser(
-        description="Download PDFs and metadata from inspirehep.net",
+        description="从 inspirehep.net 下载 PDF 和元数据",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
-  # Download both PDF and metadata for a record
+示例:
+  # 下载记录的 PDF 和元数据
   inspirehep-download 12345
 
-  # Download only PDF
+  # 仅下载 PDF
   inspirehep-download 12345 --pdf-only
 
-  # Download only metadata
+  # 仅下载元数据
   inspirehep-download 12345 --metadata-only
 
-  # Download to a specific directory
+  # 下载到特定目录
   inspirehep-download 12345 --output-dir /path/to/dir
 
-  # Save metadata as text file
+  # 将元数据另存为文本文件
   inspirehep-download 12345 --format txt
 
-  # Search for records
+  # 搜索记录
   inspirehep-download --search "author:witten" --size 5
         """
     )
@@ -38,61 +38,61 @@ Examples:
     parser.add_argument(
         "record_id",
         nargs="?",
-        help="INSPIRE-HEP record ID"
+        help="INSPIRE-HEP 记录 ID"
     )
     
     parser.add_argument(
         "--output-dir", "-o",
         default=".",
-        help="Output directory for downloaded files (default: current directory)"
+        help="下载文件的输出目录 (默认值: 当前目录)"
     )
     
     parser.add_argument(
         "--pdf-only",
         action="store_true",
-        help="Download only the PDF"
+        help="仅下载 PDF"
     )
     
     parser.add_argument(
         "--metadata-only",
         action="store_true",
-        help="Download only the metadata"
+        help="仅下载元数据"
     )
     
     parser.add_argument(
         "--format", "-f",
         choices=["json", "txt"],
         default="json",
-        help="Metadata format (default: json)"
+        help="元数据格式 (默认值: json)"
     )
     
     parser.add_argument(
         "--search", "-s",
-        help="Search query instead of record ID (e.g., 'author:witten')"
+        help="搜索查询而不是记录 ID (例如, 'author:witten')"
     )
     
     parser.add_argument(
         "--size",
         type=int,
         default=10,
-        help="Number of search results to display (default: 10)"
+        help="要显示的搜索结果数 (默认值: 10)"
     )
     
     args = parser.parse_args()
     
-    # Handle search mode
+    # 处理搜索模式
     if args.search:
         client = InspireHEPClient()
         try:
-            print(f"Searching for: {args.search}")
+            print(f"正在搜索: {args.search}")
             results = client.search_literature(args.search, size=args.size)
             hits = results.get("hits", {}).get("hits", [])
             
             if not hits:
-                print("No results found.")
+                print("未找到结果。")
                 return 0
             
-            print(f"\nFound {results.get('hits', {}).get('total', 0)} results (showing {len(hits)}):\n")
+            print(f"\n找到 {results.get('hits', {}).get('total', 0)} 个结果 (显示 {len(hits)} 个):\n")
             
             for i, hit in enumerate(hits, 1):
                 metadata = hit.get("metadata", {})
@@ -101,41 +101,41 @@ Examples:
                 authors = metadata.get("authors", [])
                 author_names = ", ".join([a.get("full_name", "") for a in authors[:3]])
                 if len(authors) > 3:
-                    author_names += f" (and {len(authors) - 3} more)"
+                    author_names += f" (以及另外 {len(authors) - 3} 位)"
                 
                 print(f"{i}. [{record_id}] {title}")
-                print(f"   Authors: {author_names}")
+                print(f"   作者: {author_names}")
                 print()
             
             return 0
         except Exception as e:
-            print(f"Error during search: {e}", file=sys.stderr)
+            print(f"搜索期间出错: {e}", file=sys.stderr)
             return 1
     
-    # Handle download mode
+    # 处理下载模式
     if not args.record_id:
         parser.print_help()
         return 1
     
     try:
-        # Determine what to download
+        # 确定要下载什么
         download_pdf_flag = not args.metadata_only
         download_metadata_flag = not args.pdf_only
         
         if args.metadata_only:
-            # Download only metadata
+            # 仅下载元数据
             download_metadata(args.record_id, args.output_dir, format=args.format)
         elif args.pdf_only:
-            # Download only PDF
+            # 仅下载 PDF
             download_pdf(args.record_id, args.output_dir)
         else:
-            # Download both
+            # 下载两者
             download_record(args.record_id, args.output_dir, download_pdf_flag, download_metadata_flag)
         
         return 0
     
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        print(f"错误: {e}", file=sys.stderr)
         return 1
 
 

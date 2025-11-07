@@ -1,6 +1,6 @@
 """
-INSPIRE-HEP Downloader
-A Python library for downloading PDFs and metadata from inspirehep.net using their API.
+INSPIRE-HEP 下载器
+一个使用其 API 从 inspirehep.net 下载 PDF 和元数据的 Python 库。
 """
 
 __version__ = "0.1.0"

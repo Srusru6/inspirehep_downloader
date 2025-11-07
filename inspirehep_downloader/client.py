@@ -1,5 +1,5 @@
 """
-Client for interacting with INSPIRE-HEP API.
+用于与 INSPIRE-HEP API 交互的客户端。
 """
 
 import requests
@@ -8,16 +8,16 @@ import json
 
 
 class InspireHEPClient:
-    """Client for accessing INSPIRE-HEP API."""
+    """用于访问 INSPIRE-HEP API 的客户端。"""
     
     BASE_URL = "https://inspirehep.net/api"
     
     def __init__(self, timeout: int = 30):
         """
-        Initialize the INSPIRE-HEP client.
+        初始化 INSPIRE-HEP 客户端。
         
         Args:
-            timeout: Request timeout in seconds (default: 30)
+            timeout: 请求超时秒数 (默认值: 30)
         """
         self.timeout = timeout
         self.session = requests.Session()
@@ -27,18 +27,18 @@ class InspireHEPClient:
     
     def search_literature(self, query: str, size: int = 10, page: int = 1) -> Dict:
         """
-        Search for literature in INSPIRE-HEP.
+        在 INSPIRE-HEP 中搜索文献。
         
         Args:
-            query: Search query string (e.g., "author:witten", "title:supersymmetry")
-            size: Number of results to return (default: 10)
-            page: Page number for pagination (default: 1)
+            query: 搜索查询字符串 (例如, "author:witten", "title:supersymmetry")
+            size: 返回的结果数 (默认值: 10)
+            page: 用于分页的页码 (默认值: 1)
         
         Returns:
-            Dictionary containing search results
+            包含搜索结果的字典
         
         Raises:
-            requests.exceptions.RequestException: If the request fails
+            requests.exceptions.RequestException: 如果请求失败
         """
         url = f"{self.BASE_URL}/literature"
         params = {
@@ -53,16 +53,16 @@ class InspireHEPClient:
     
     def get_record(self, record_id: str) -> Dict:
         """
-        Get a specific literature record by ID.
+        按 ID 获取特定的文献记录。
         
         Args:
-            record_id: The INSPIRE-HEP record ID
+            record_id: INSPIRE-HEP 记录 ID
         
         Returns:
-            Dictionary containing the record metadata
+            包含记录元数据的字典
         
         Raises:
-            requests.exceptions.RequestException: If the request fails
+            requests.exceptions.RequestException: 如果请求失败
         """
         url = f"{self.BASE_URL}/literature/{record_id}"
         
@@ -72,24 +72,24 @@ class InspireHEPClient:
     
     def get_pdf_url(self, record_id: str) -> Optional[str]:
         """
-        Get the PDF URL for a specific record.
+        获取特定记录的 PDF URL。
         
         Args:
-            record_id: The INSPIRE-HEP record ID
+            record_id: INSPIRE-HEP 记录 ID
         
         Returns:
-            URL of the PDF if available, None otherwise
+            PDF 的 URL (如果可用)，否则为 None
         """
         record = self.get_record(record_id)
         metadata = record.get("metadata", {})
         
-        # Check for documents with PDFs
+        # 检查带有 PDF 的文档
         documents = metadata.get("documents", [])
         for doc in documents:
             if doc.get("key", "").endswith(".pdf"):
                 return doc.get("url")
         
-        # Check for arxiv eprints
+        # 检查 arxiv eprints
         arxiv_eprints = metadata.get("arxiv_eprints", [])
         if arxiv_eprints:
             arxiv_id = arxiv_eprints[0].get("value")
@@ -100,18 +100,18 @@ class InspireHEPClient:
     
     def get_metadata(self, record_id: str) -> Dict:
         """
-        Get formatted metadata for a specific record.
+        获取特定记录的格式化元数据。
         
         Args:
-            record_id: The INSPIRE-HEP record ID
+            record_id: INSPIRE-HEP 记录 ID
         
         Returns:
-            Dictionary containing formatted metadata
+            包含格式化元数据的字典
         """
         record = self.get_record(record_id)
         metadata = record.get("metadata", {})
         
-        # Extract relevant metadata
+        # 提取相关元数据
         formatted_metadata = {
             "record_id": record_id,
             "title": metadata.get("titles", [{}])[0].get("title", "N/A"),
@@ -129,14 +129,14 @@ class InspireHEPClient:
     
     def download_file(self, url: str, output_path: str) -> None:
         """
-        Download a file from a URL.
+        从 URL 下载文件。
         
         Args:
-            url: URL of the file to download
-            output_path: Path where the file should be saved
+            url: 要下载的文件的 URL
+            output_path: 文件应保存的路径
         
         Raises:
-            requests.exceptions.RequestException: If the download fails
+            requests.exceptions.RequestException: 如果下载失败
         """
         response = self.session.get(url, stream=True, timeout=self.timeout)
         response.raise_for_status()

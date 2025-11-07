@@ -1,46 +1,46 @@
-# Security Summary
+# 安全摘要
 
-## CodeQL Analysis
+## CodeQL 分析
 
-CodeQL analysis was run on the codebase and found 1 alert:
+对代码库运行了 CodeQL 分析，发现 1 个警报：
 
-### Alert: Incomplete URL substring sanitization (py/incomplete-url-substring-sanitization)
-- **Location**: test_implementation.py, line 71
-- **Severity**: Low
-- **Status**: False Positive
+### 警报：不完整的 URL 子字符串清理 (py/incomplete-url-substring-sanitization)
+- **位置**: test_implementation.py, 第 71 行
+- **严重性**: 低
+- **状态**: 误报
 
-#### Analysis:
-The alert is triggered by this line in the test file:
+#### 分析:
+警报由测试文件中的此行触发：
 ```python
 assert 'inspirehep.net' in result.stdout
 ```
 
-This is a false positive because:
-1. This code is in a test file, not production code
-2. It's checking if the help text contains the string "inspirehep.net", not performing URL sanitization
-3. There's no user input or URL manipulation happening here
-4. This is a simple string contains check for validation purposes
+这是一个误报，因为：
+1. 此代码位于测试文件中，而不是生产代码中
+2. 它正在检查帮助文本是否包含字符串“inspirehep.net”，而不是执行 URL 清理
+3. 此处没有发生用户输入或 URL 操作
+4. 这是一个用于验证目的的简单字符串包含检查
 
-#### Main Code Security:
-The main codebase uses hardcoded URLs for the INSPIRE-HEP API:
-- `BASE_URL = "https://inspirehep.net/api"` - Hardcoded API endpoint
-- `f"https://inspirehep.net/literature/{record_id}"` - Template for record URLs
+#### 主代码安全性:
+主代码库对 INSPIRE-HEP API 使用硬编码的 URL：
+- `BASE_URL = "https://inspirehep.net/api"` - 硬编码的 API 端点
+- `f"https://inspirehep.net/literature/{record_id}"` - 记录 URL 的模板
 
-These are appropriate uses and don't pose security risks because:
-1. The base URLs are hardcoded constants
-2. Record IDs are used in path construction, not domain construction
-3. The `requests` library handles URL encoding properly
+这些是适当的用法，不会带来安全风险，因为：
+1. 基本 URL 是硬编码的常量
+2. 记录 ID 用于路径构建，而不是域构建
+3. `requests` 库正确处理 URL 编码
 
-## Dependency Security
+## 依赖项安全性
 
-The project has minimal dependencies:
-- `requests>=2.25.0` - Well-maintained, widely-used HTTP library
+该项目的依赖项极少：
+- `requests>=2.25.0` - 维护良好、广泛使用的 HTTP 库
 
-## Conclusion
+## 结论
 
-No actual security vulnerabilities were found. The single CodeQL alert is a false positive in test code. The main codebase follows security best practices:
-- Uses HTTPS for all connections
-- Properly handles user input
-- Uses established libraries for HTTP communication
-- No hardcoded credentials or secrets
-- Proper error handling throughout
+未发现实际的安全漏洞。唯一的 CodeQL 警报是测试代码中的误报。主代码库遵循安全最佳实践：
+- 对所有连接使用 HTTPS
+- 正确处理用户输入
+- 使用已建立的库进行 HTTP 通信
+- 没有硬编码的凭据或机密
+- 贯穿始终的正确错误处理

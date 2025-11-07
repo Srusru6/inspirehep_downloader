@@ -1,167 +1,167 @@
-# How to Use INSPIRE-HEP Downloader
+# 如何使用 INSPIRE-HEP 下载器
 
-## Quick Reference
+## 快速参考
 
-### Command Line Usage
+### 命令行用法
 
 ```bash
-# Basic download (PDF + metadata)
+# 基本下载 (PDF + 元数据)
 inspirehep-download <record_id>
 
-# Search for papers
+# 搜索论文
 inspirehep-download --search "author:surname"
 
-# Download only PDF
+# 仅下载 PDF
 inspirehep-download <record_id> --pdf-only
 
-# Download only metadata
+# 仅下载元数据
 inspirehep-download <record_id> --metadata-only
 
-# Specify output directory
+# 指定输出目录
 inspirehep-download <record_id> -o /path/to/dir
 
-# Get metadata as text file
+# 以文本文件形式获取元数据
 inspirehep-download <record_id> --format txt
 ```
 
-### Python API Usage
+### Python API 用法
 
 ```python
 from inspirehep_downloader import InspireHEPClient, download_pdf, download_metadata
 
-# Initialize client
+# 初始化客户端
 client = InspireHEPClient()
 
-# Search
+# 搜索
 results = client.search_literature("author:witten", size=10)
 
-# Download
+# 下载
 download_pdf("12345", output_dir="./papers")
 download_metadata("12345", output_dir="./papers", format="json")
 ```
 
-## Common Workflows
+## 常见工作流程
 
-### 1. Find and Download Papers by an Author
+### 1. 按作者查找和下载论文
 
 ```bash
-# First, search for the author
+# 首先，搜索作者
 inspirehep-download --search "author:maldacena" --size 10
 
-# Note the record IDs from the results
-# Then download specific papers
+# 从结果中记下记录 ID
+# 然后下载特定的论文
 inspirehep-download 123456 -o ./maldacena_papers
 inspirehep-download 789012 -o ./maldacena_papers
 ```
 
-### 2. Batch Download Papers (Python)
+### 2. 批量下载论文 (Python)
 
 ```python
 from inspirehep_downloader import InspireHEPClient, download_record
 
 client = InspireHEPClient()
 
-# Search for papers
+# 搜索论文
 results = client.search_literature("black holes AND author:hawking", size=20)
 
-# Download all results
+# 下载所有结果
 for hit in results["hits"]["hits"]:
     record_id = hit["id"]
     title = hit["metadata"]["titles"][0]["title"]
     
-    print(f"Downloading: {title}")
+    print(f"正在下载: {title}")
     try:
         download_record(record_id, output_dir="./hawking_black_holes")
     except Exception as e:
-        print(f"  Failed: {e}")
+        print(f"  失败: {e}")
 ```
 
-### 3. Get Metadata Only for Citation Management
+### 3. 仅获取元数据用于引文管理
 
 ```bash
-# Download metadata in JSON format for import into reference managers
+# 下载 JSON 格式的元数据以导入参考文献管理器
 inspirehep-download 12345 --metadata-only --format json -o ./references
 ```
 
-### 4. Check Paper Details Before Downloading
+### 4. 下载前检查论文档案
 
 ```python
 from inspirehep_downloader import InspireHEPClient
 
 client = InspireHEPClient()
 
-# Get metadata first
+# 首先获取元数据
 metadata = client.get_metadata("12345")
 
-print(f"Title: {metadata['title']}")
-print(f"Authors: {', '.join(metadata['authors'][:3])}")
-print(f"Citations: {metadata['citations']}")
+print(f"标题: {metadata['title']}")
+print(f"作者: {', '.join(metadata['authors'][:3])}")
+print(f"引文: {metadata['citations']}")
 print(f"arXiv: {metadata['arxiv_id']}")
 
-# Decide whether to download based on metadata
+# 根据元数据决定是否下载
 if metadata['citations'] > 100:
     from inspirehep_downloader import download_pdf
     download_pdf("12345")
 ```
 
-## Search Query Examples
+## 搜索查询示例
 
-The search function supports INSPIRE-HEP's query syntax:
+搜索功能支持 INSPIRE-HEP 的查询语法:
 
 ```bash
-# By author
+# 按作者
 inspirehep-download --search "author:witten"
 
-# By multiple authors
+# 按多个作者
 inspirehep-download --search "author:witten AND author:maldacena"
 
-# By title keywords
+# 按标题关键字
 inspirehep-download --search "title:supersymmetry"
 
-# By abstract
+# 按摘要
 inspirehep-download --search "abstract:quantum gravity"
 
-# By arXiv ID
+# 按 arXiv ID
 inspirehep-download --search "arxiv:1234.5678"
 
-# By DOI
+# 按 DOI
 inspirehep-download --search "doi:10.1234/example"
 
-# By date
+# 按日期
 inspirehep-download --search "date > 2020"
 
-# Complex queries
+# 复杂查询
 inspirehep-download --search "author:witten AND title:M-theory AND date > 1995"
 ```
 
-## Tips and Tricks
+## 提示和技巧
 
-### 1. Handling Missing PDFs
+### 1. 处理缺失的 PDF
 
-Not all papers have PDFs available. Use metadata-only mode when PDFs aren't available:
+并非所有论文都有可用的 PDF。当 PDF 不可用时，请使用仅元数据模式：
 
 ```bash
-# Try to download PDF
+# 尝试下载 PDF
 inspirehep-download 12345 --pdf-only
 
-# If it fails, get metadata instead
+# 如果失败，则获取元数据
 inspirehep-download 12345 --metadata-only
 ```
 
-### 2. Custom Timeouts for Slow Connections
+### 2. 为慢速连接自定义超时
 
 ```python
 from inspirehep_downloader import InspireHEPClient
 
-# Increase timeout to 2 minutes
+# 将超时增加到 2 分钟
 client = InspireHEPClient(timeout=120)
 record = client.get_record("12345")
 ```
 
-### 3. Organizing Downloads
+### 3. 组织下载
 
 ```bash
-# Create author-specific directories
+# 创建特定于作者的目录
 mkdir -p ./papers/witten
 inspirehep-download 12345 -o ./papers/witten
 
@@ -169,7 +169,7 @@ mkdir -p ./papers/maldacena
 inspirehep-download 67890 -o ./papers/maldacena
 ```
 
-### 4. Extracting Record IDs from Search
+### 4. 从搜索中提取记录 ID
 
 ```python
 from inspirehep_downloader import InspireHEPClient
@@ -177,63 +177,63 @@ from inspirehep_downloader import InspireHEPClient
 client = InspireHEPClient()
 results = client.search_literature("author:witten", size=100)
 
-# Get all record IDs
+# 获取所有记录 ID
 record_ids = [hit["id"] for hit in results["hits"]["hits"]]
-print(f"Found {len(record_ids)} papers")
+print(f"找到 {len(record_ids)} 篇论文")
 
-# Save to file
+# 保存到文件
 with open("witten_record_ids.txt", "w") as f:
     f.write("\n".join(record_ids))
 ```
 
-## Troubleshooting
+## 疑难解答
 
-### Problem: Command not found
+### 问题: 找不到命令
 
-**Solution**: Reinstall the package
+**解决方案**: 重新安装软件包
 ```bash
 pip install -e .
 ```
 
-### Problem: Connection timeout
+### 问题: 连接超时
 
-**Solution**: Increase timeout or check internet connection
+**解决方案**: 增加超时或检查互联网连接
 ```python
-client = InspireHEPClient(timeout=300)  # 5 minutes
+client = InspireHEPClient(timeout=300)  # 5 分钟
 ```
 
-### Problem: PDF not available
+### 问题: PDF 不可用
 
-**Solution**: Try getting the arXiv ID and download directly from arXiv
+**解决方案**: 尝试获取 arXiv ID 并直接从 arXiv 下载
 ```python
 metadata = client.get_metadata("12345")
 arxiv_id = metadata['arxiv_id']
-# Use: https://arxiv.org/pdf/{arxiv_id}.pdf
+# 使用: https://arxiv.org/pdf/{arxiv_id}.pdf
 ```
 
-### Problem: Rate limiting
+### 问题: 速率限制
 
-**Solution**: Add delays between requests
+**解决方案**: 在请求之间添加延迟
 ```python
 import time
 
 for record_id in record_ids:
     download_record(record_id)
-    time.sleep(2)  # Wait 2 seconds between downloads
+    time.sleep(2)  # 每次下载之间等待 2 秒
 ```
 
-## Advanced Usage
+## 高级用法
 
-### Custom File Names
+### 自定义文件名
 
 ```python
 from inspirehep_downloader import download_pdf
 
-# Use custom filename
+# 使用自定义文件名
 download_pdf("12345", output_dir="./papers", filename="witten_mtheory.pdf")
 ```
 
-### Error Handling
+### 错误处理
 
 ```python
 from inspirehep_downloader import download_record
@@ -241,36 +241,36 @@ from inspirehep_downloader import download_record
 try:
     results = download_record("12345")
     if results['pdf']:
-        print(f"PDF downloaded: {results['pdf']}")
+        print(f"PDF 已下载: {results['pdf']}")
     if results['metadata']:
-        print(f"Metadata downloaded: {results['metadata']}")
+        print(f"元数据已下载: {results['metadata']}")
 except ValueError as e:
-    print(f"Download error: {e}")
+    print(f"下载错误: {e}")
 except Exception as e:
-    print(f"Unexpected error: {e}")
+    print(f"意外错误: {e}")
 ```
 
-### Processing Metadata
+### 处理元数据
 
 ```python
 import json
 from inspirehep_downloader import download_metadata
 
-# Download as JSON
+# 下载为 JSON
 metadata_path = download_metadata("12345", format="json")
 
-# Load and process
+# 加载和处理
 with open(metadata_path, 'r') as f:
     data = json.load(f)
     
-# Extract information
-print(f"This paper has {len(data['authors'])} authors")
-print(f"It has been cited {data['citations']} times")
+# 提取信息
+print(f"这篇论文有 {len(data['authors'])} 位作者")
+print(f"它已被引用 {data['citations']} 次")
 ```
 
-## Need More Help?
+## 需要更多帮助?
 
-- Check the [README](README.md) for detailed documentation
-- See [QUICKSTART](QUICKSTART.md) for getting started
-- Run `inspirehep-download --help` for command options
-- Check [examples.py](examples.py) for code examples
+- 查看 [README](README.md) 获取详细文档
+- 查看 [QUICKSTART](QUICKSTART.md) 了解入门指南
+- 运行 `inspirehep-download --help` 查看命令选项
+- 查看 [examples.py](examples.py) 获取代码示例
