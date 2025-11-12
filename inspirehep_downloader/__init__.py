@@ -7,5 +7,6 @@ __version__ = "0.1.0"
 
 from .client import InspireHEPClient
 from .downloader import download_pdf, download_metadata, download_record
+from .checkmentor_integration import search_and_download_author_papers
 
-__all__ = ["InspireHEPClient", "download_pdf", "download_metadata", "download_record"]
+__all__ = ["InspireHEPClient", "download_pdf", "download_metadata", "download_record", "search_and_download_author_papers"]

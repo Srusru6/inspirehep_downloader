@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="inspirehep_downloader",
     version="0.1.0",
-    author="INSPIRE-HEP Downloader 贡献者",
+    author="Srusru6",
     description="使用 API 从 inspirehep.net 下载 PDF 和元数据",
     long_description=long_description,
     long_description_content_type="text/markdown",
